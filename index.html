@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalRep — Gestión Inteligente de Reputación y Reseñas</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="LocalRep es la plataforma Micro-SaaS definitiva para el filtrado inteligente de opiniones (Review Gating). Impulsa tus 5 estrellas en Google Maps y captura alertas críticas de forma confidencial para retener y deleitar a tus clientes de manera directa.">
+  <meta name="keywords" content="reputacion local, review gating, reseñas google maps, feedback de clientes, micro-saas">
+  <meta name="author" content="LocalRep">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Icono favicon premium sutil (SVG incorporado) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2225%22 fill=%22%231c1917%22/><path d=%22M30 40 L50 20 L70 40 L60 40 L60 70 L40 70 L40 40 Z%22 fill=%22%23faf9f6%22/></svg>">
+
+  <!-- Carga del CDN Oficial de Navegador de Tailwind CSS v4 (Compilación JIT en vivo extremadamente rápida) -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <!-- Vinculación de Estilos e Importaciones Personalizadas -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-stone-50 text-stone-900 min-h-screen flex flex-col justify-between select-none">
+
+  <!-- ANCLA PRINCIPAL PARA LA INYECCIÓN DINÁMICA DE LA SPA -->
+  <main id="app-root" class="flex-grow w-full" aria-live="polite">
+    <!-- El enrutador inyectará la vista activa aquí (Funnel, Login, Dashboard) -->
+    
+    <!-- Animación de Precarga Inicial Ultra-Premium -->
+    <div class="min-h-[80vh] flex flex-col items-center justify-center gap-4 animate-pulse">
+      <div class="w-12 h-12 rounded-full bg-stone-950 flex items-center justify-center font-heading font-black text-white text-lg tracking-wide shadow-lg">
+        LR
+      </div>
+      <div class="flex items-center gap-1.5 text-xs text-stone-400 font-sans tracking-wide">
+        <span class="w-1.5 h-1.5 rounded-full bg-stone-300 animate-bounce" style="animation-delay: 0ms;"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-stone-300 animate-bounce" style="animation-delay: 150ms;"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-stone-300 animate-bounce" style="animation-delay: 300ms;"></span>
+        <span>Cargando interfaz premium...</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- PIE DE PÁGINA GLOBAL E ELEGANTE -->
+  <footer class="w-full border-t border-stone-200/60 py-6 bg-white/40 backdrop-blur-sm text-center relative z-20">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-stone-450 font-sans text-xs">
+      <div>
+        <p>© 2026 <strong>LocalRep</strong>. Todos los derechos reservados. Diseñado para la excelencia en reputación local.</p>
+      </div>
+      <div class="flex items-center gap-4 font-semibold text-stone-500">
+        <a href="#/review/stellaensenada" class="hover:text-stone-900 transition-colors">Stella Cucina</a>
+        <span class="text-stone-300">|</span>
+        <a href="#/dashboard" class="hover:text-stone-900 transition-colors">Acceso Dashboard</a>
+        <span class="text-stone-300">|</span>
+        <a href="#/review/cafe-del-sol" class="hover:text-stone-900 transition-colors">Demo Café</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SWITCHER FLOTANTE EXCLUSIVO PARA FACILITAR REVISIÓN TÉCNICA (Bottom-Left) -->
+  <div class="fixed bottom-5 left-5 z-45 hidden md:flex items-center gap-1.5 bg-stone-950 text-stone-200 border border-stone-800 p-2 rounded-xl shadow-2xl transition-all duration-300 hover:scale-[1.03] select-none hover:border-stone-700">
+    <span class="text-[9px] uppercase tracking-wider font-extrabold text-stone-400 pl-1">Entornos:</span>
+    <a href="#/review/cafe-del-sol" 
+      class="px-2.5 py-1.5 hover:bg-stone-850 hover:text-white rounded-lg text-[10px] font-bold transition-all uppercase tracking-wide">
+      📣 Cliente (Embudo)
+    </a>
+    <span class="text-stone-800">|</span>
+    <a href="#/dashboard" 
+      class="px-2.5 py-1.5 hover:bg-stone-850 hover:text-white rounded-lg text-[10px] font-bold transition-all uppercase tracking-wide">
+      💻 Dueño (Panel)
+    </a>
+  </div>
+
+  <!-- Carga del Módulo de Lógica JavaScript de la SPA -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

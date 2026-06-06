@@ -1,0 +1,13 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(css|js|assets)/(.*)",
+      "destination": "/$1/$2"
+    },
+    {
+      "source": "/((?!css|js|assets).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
