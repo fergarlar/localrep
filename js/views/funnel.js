@@ -8,7 +8,7 @@ export class FunnelView {
    * @param {HTMLElement} targetTarget Destino HTML
    * @param {string} businessId ID del negocio
    */
-  static render(targetTarget, businessId) {
+  static async render(targetTarget, businessId) {
     const business = getBusiness(businessId);
 
     // Si el negocio no existe, mostrar pantalla de error minimalista
@@ -205,7 +205,7 @@ export class FunnelView {
       });
 
       // --- LÓGICA DE CLIC EN ESTRELLA ---
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", async () => {
         const val = parseInt(btn.getAttribute("data-value"));
         currentSelectedRating = val;
         highlightStars(val);
@@ -216,7 +216,7 @@ export class FunnelView {
         // 1. REGLA DE REDIRECCIÓN (4 o 5 estrellas)
         if (val === 4 || val === 5) {
           // Registrar clic de redirección pública
-          addPublicClick(businessId, val);
+          await addPublicClick(businessId, val);
 
           // Transicionar a la pantalla de redirección
           ratingScreen.classList.add("hidden");
@@ -256,7 +256,7 @@ export class FunnelView {
     });
 
     // Envío del Formulario Crítico
-    feedbackForm.addEventListener("submit", (e) => {
+    feedbackForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       // Activar animación
@@ -267,20 +267,12 @@ export class FunnelView {
       const phone = targetTarget.querySelector("#form-phone").value;
       const comment = targetTarget.querySelector("#form-comment").value;
 
-      // Retardo de experiencia de usuario sutil (800ms)
-      setTimeout(() => {
-        // Guardar opinión crítica
-        const newReview = addReview(businessId, currentSelectedRating, name, phone, comment);
+      try {
+        // Guardar opinión crítica (llamada remota/asíncrona)
+        const newReview = await addReview(businessId, currentSelectedRating, name, phone, comment);
 
-        formSubmitBtn.disabled = false;
-        formSpinner.classList.add("hidden");
-
-        // Transicionar a pantalla de agradecimiento
-        formScreen.classList.add("hidden");
-        successScreen.classList.remove("hidden");
-
-        // --- DISPARAR SIMULACIÓN DE WEBHOOK ---
-        const webhookUrl = getWebhookUrl(businessId);
+        // Obtener webhook URL de forma asíncrona
+        const webhookUrl = await getWebhookUrl(businessId);
         
         // Crear el payload formalizado
         const payload = {
@@ -299,7 +291,17 @@ export class FunnelView {
         // Mostrar notificación de webhook en la interfaz administrativa
         WebhookToast.show(payload, webhookUrl);
 
-      }, 800);
+        formSubmitBtn.disabled = false;
+        formSpinner.classList.add("hidden");
+
+        // Transicionar a pantalla de agradecimiento
+        formScreen.classList.add("hidden");
+        successScreen.classList.remove("hidden");
+      } catch (err) {
+        console.error("Error al registrar opinión crítica:", err);
+        formSubmitBtn.disabled = false;
+        formSpinner.classList.add("hidden");
+      }
     });
 
     // --- FUNCIONES AUXILIARES INTERNAS ---

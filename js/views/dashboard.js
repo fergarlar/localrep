@@ -1,21 +1,24 @@
 // Módulo del Panel Administrativo (Client Dashboard) - /dashboard
-import { getBusiness, getReviews, getMetrics, updateReviewStatus, saveWebhookUrl } from "../database.js";
+import { getBusiness, getReviews, getMetrics, updateReviewStatus, saveWebhookUrl, getWebhookUrl } from "../database.js";
 import { AnalyticsChart } from "../components/chart.js";
 import { WebhookToast } from "../components/toast.js";
 
 export class DashboardView {
   /**
-   * Renderiza e inicializa el Dashboard en el elemento destino.
+   * Renderiza e inicializa el Dashboard en el elemento destino de forma asíncrona.
    * @param {HTMLElement} targetTarget Destino HTML
    * @param {string} businessId ID del negocio autenticado
    * @param {Function} onLogoutCallback Callback al cerrar sesión
    */
-  static render(targetTarget, businessId, onLogoutCallback) {
+  static async render(targetTarget, businessId, onLogoutCallback) {
     const business = getBusiness(businessId);
     if (!business) {
       onLogoutCallback();
       return;
     }
+
+    // Obtener webhook URL de forma asíncrona
+    const webhookUrl = await getWebhookUrl(business.id);
 
     // Renderizar maquetación base del panel administrativo
     targetTarget.innerHTML = `
@@ -136,7 +139,7 @@ export class DashboardView {
                   <input type="url" id="webhook-url-input" 
                     class="block w-full px-3 py-2.5 border border-stone-250 rounded-xl bg-white text-xs placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-900 transition-all font-sans text-stone-900"
                     placeholder="https://hook.eu2.make.com/..." 
-                    value="${business.webhook_url || ''}">
+                    value="${webhookUrl || ''}">
                 </div>
               </div>
             </div>
@@ -214,20 +217,16 @@ export class DashboardView {
     });
 
     // Guardar URL de Webhook
-    saveWebhookBtn.addEventListener("click", () => {
+    saveWebhookBtn.addEventListener("click", async () => {
       const url = webhookUrlInput.value;
-      const success = saveWebhookUrl(business.id, url);
+      const success = await saveWebhookUrl(business.id, url);
       if (success) {
-        // Actualizar referencia de webhook
-        business.webhook_url = url;
-        
-        // Mostrar alerta sutil con toast
         alertToast("Configuración guardada", "El Webhook ha sido configurado correctamente.");
       }
     });
 
     // Enviar Webhook de Prueba
-    testWebhookBtn.addEventListener("click", () => {
+    testWebhookBtn.addEventListener("click", async () => {
       const payload = {
         event: "test_connection",
         business_id: business.id,
@@ -245,29 +244,31 @@ export class DashboardView {
     });
 
     // --- GESTIÓN DE FILTROS ---
-    filterAllBtn.addEventListener("click", () => {
+    filterAllBtn.addEventListener("click", async () => {
       currentFilter = "all";
       filterAllBtn.className = "px-3.5 py-1.5 bg-stone-950 text-stone-100 transition-colors";
       filterPendingBtn.className = "px-3.5 py-1.5 text-stone-600 hover:text-stone-950 hover:bg-stone-100 border-l border-stone-200 transition-colors";
-      renderInbox();
+      await renderInbox();
     });
 
-    filterPendingBtn.addEventListener("click", () => {
+    filterPendingBtn.addEventListener("click", async () => {
       currentFilter = "pendiente";
       filterPendingBtn.className = "px-3.5 py-1.5 bg-stone-950 text-stone-100 transition-colors";
       filterAllBtn.className = "px-3.5 py-1.5 text-stone-600 hover:text-stone-950 hover:bg-stone-100 transition-colors";
-      renderInbox();
+      await renderInbox();
     });
 
     // --- INICIALIZAR RENDERIZADO DEL PANEL ---
-    syncMetricsAndChart();
-    renderInbox();
+    (async () => {
+      await syncMetricsAndChart();
+      await renderInbox();
+    })();
 
     // --- FUNCIONES INTERNAS REACTIVAS ---
 
     // 1. Sincronizar Tarjetas de Métricas y el Gráfico SVG
-    function syncMetricsAndChart() {
-      const metrics = getMetrics(business.id);
+    async function syncMetricsAndChart() {
+      const metrics = await getMetrics(business.id);
       
       // Actualizar valores en HTML
       document.getElementById("metric-avg-rating").textContent = metrics.averageRating.toFixed(1);
@@ -286,8 +287,8 @@ export class DashboardView {
     }
 
     // 2. Renderizar Tabla de Opiniones Críticas
-    function renderInbox() {
-      let reviews = getReviews(business.id);
+    async function renderInbox() {
+      let reviews = await getReviews(business.id);
 
       // Aplicar filtro si corresponde
       if (currentFilter === "pendiente") {
@@ -332,7 +333,7 @@ export class DashboardView {
                 </a>
               </div>
             </td>
-
+ 
             <!-- Estrellas Calificación -->
             <td class="px-4 py-3.5 whitespace-nowrap">
               <div class="flex items-center gap-0.5 text-amber-400">
@@ -343,10 +344,10 @@ export class DashboardView {
                 `).join("")}
               </div>
             </td>
-
+ 
             <!-- Comentario Privado -->
             <td class="px-4 py-3.5 text-xs text-stone-600 max-w-xs break-words leading-relaxed">${review.comment}</td>
-
+ 
             <!-- Badge de Estado Interactivo -->
             <td class="px-4 py-3.5 text-center whitespace-nowrap">
               <button data-id="${review.id}" data-status="${review.status}"
@@ -361,33 +362,33 @@ export class DashboardView {
           </tr>
         `;
       }).join("");
-
+ 
       // Configurar eventos para los badges de estado interactivos
       const badges = tbody.querySelectorAll("button[data-status='Pendiente']");
       badges.forEach(badge => {
-        badge.addEventListener("click", () => {
+        badge.addEventListener("click", async () => {
           const id = badge.getAttribute("data-id");
           
           // Actualizar estado en base de datos
-          updateReviewStatus(id, "Atendido");
-
+          await updateReviewStatus(id, "Atendido");
+ 
           // Mostrar micro-transición visual en el botón
           badge.classList.remove("bg-amber-100", "text-amber-800", "hover:bg-stone-900", "hover:text-stone-100");
           badge.classList.add("bg-stone-100", "text-stone-500", "scale-90");
           badge.textContent = "Atendido";
           badge.style.pointerEvents = "none";
           badge.disabled = true;
-
+ 
           // Sincronizar el dashboard completo con retardo suave
-          setTimeout(() => {
-            syncMetricsAndChart();
-            renderInbox();
+          setTimeout(async () => {
+            await syncMetricsAndChart();
+            await renderInbox();
             alertToast("Alerta Actualizada", "El caso crítico ha sido marcado como Atendido con éxito.");
           }, 350);
         });
       });
     }
-
+ 
     // Alerta sutil flotante tipo Toast simplificada
     function alertToast(title, message) {
       const alert = document.createElement("div");

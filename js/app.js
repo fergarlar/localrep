@@ -15,7 +15,7 @@ const appContainer = document.getElementById("app-root");
 
 /**
  * Navega a una ruta específica, adaptando el formato según el protocolo (Vercel vs Local)
- * @param {string} path Ruta de destino (ej. '/dashboard' o '/review/cafe-del-sol')
+ * @param {string} path Ruta de destino (ej. '/dashboard' o '/review/stellaensenada')
  */
 export const navigateTo = (path) => {
   if (window.location.protocol === "file:") {
@@ -24,21 +24,21 @@ export const navigateTo = (path) => {
   } else {
     // Si se ejecuta en un servidor web (ej. Vercel), usar la API de History HTML5
     window.history.pushState(null, "", path);
-    handleRoute();
+    handleRoute().catch(err => console.error("Error al enrutar:", err));
   }
 };
 
 /**
- * Resuelve y enruta la vista actual según la URL
+ * Resuelve y enruta la vista actual según la URL de forma asíncrona
  */
-const handleRoute = () => {
+const handleRoute = async () => {
   const hash = window.location.hash;
   const path = window.location.pathname;
 
   let viewName = "";
   let businessIdParam = "";
 
-  // 1. Resolver ruta desde Hash (para compatibilidad file://)
+  // 1. Resolver ruta desde Hash (para compatibilidad file:// o local)
   if (hash && hash.startsWith("#/")) {
     const parts = hash.substring(2).split("/");
     viewName = parts[0];
@@ -59,7 +59,7 @@ const handleRoute = () => {
   // A. Ruta del Embudo de opiniones de clientes: /review/:business_id
   if (viewName === "review" && businessIdParam) {
     AppState.activeView = "review";
-    FunnelView.render(appContainer, businessIdParam);
+    await FunnelView.render(appContainer, businessIdParam);
   }
   // B. Ruta del Panel Administrativo de negocio: /dashboard
   else if (viewName === "dashboard") {
@@ -72,14 +72,14 @@ const handleRoute = () => {
       const business = getBusiness(savedId);
       if (business) {
         AppState.currentBusiness = business;
-        DashboardView.render(appContainer, business.id, handleLogout);
+        await DashboardView.render(appContainer, business.id, handleLogout);
         return;
       }
     }
 
     // Si no está autenticado, renderizar login
     LoginView.render(appContainer, AppState, (authenticatedBusiness) => {
-      // Callback de Login exitoso: Transición animada al dashboard
+      // Callback de Login exitoso: Transición al dashboard
       AppState.currentBusiness = authenticatedBusiness;
       navigateTo("/dashboard");
     });
@@ -99,13 +99,17 @@ const handleLogout = () => {
 };
 
 // --- INICIALIZACIÓN ---
-const init = () => {
+const init = async () => {
   // Inicializar base de datos con datos semilla
   initDatabase();
 
   // Escuchar eventos de navegación
-  window.addEventListener("popstate", handleRoute);
-  window.addEventListener("hashchange", handleRoute);
+  window.addEventListener("popstate", () => {
+    handleRoute().catch(err => console.error("Error al enrutar:", err));
+  });
+  window.addEventListener("hashchange", () => {
+    handleRoute().catch(err => console.error("Error al enrutar:", err));
+  });
 
   // Interceptar todos los clics en enlaces con atributo [data-link]
   document.body.addEventListener("click", (e) => {
@@ -117,12 +121,13 @@ const init = () => {
   });
 
   // Ejecutar el enrutamiento inicial
-  handleRoute();
+  await handleRoute();
 };
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", () => {
+    init().catch(err => console.error("Error en inicialización:", err));
+  });
 } else {
-  init();
+  init().catch(err => console.error("Error en inicialización:", err));
 }
-
