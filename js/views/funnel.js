@@ -43,9 +43,15 @@ export class FunnelView {
 
           <!-- Cabecera con Logo y Nombre -->
           <div class="flex flex-col items-center text-center gap-3 relative z-10">
-            <div class="w-14 h-14 rounded-full bg-stone-950 text-white font-heading font-extrabold text-xl flex items-center justify-center shadow-lg uppercase tracking-wide">
-              ${business.name.substring(0, 2)}
-            </div>
+            ${business.logo_url ? `
+              <div class="h-20 flex items-center justify-center mb-1">
+                <img src="${business.logo_url.startsWith('http') || window.location.protocol === 'file:' ? business.logo_url : '/' + business.logo_url}" alt="${business.name}" class="h-full object-contain">
+              </div>
+            ` : `
+              <div class="w-14 h-14 rounded-full bg-stone-950 text-white font-heading font-extrabold text-xl flex items-center justify-center shadow-lg uppercase tracking-wide">
+                ${business.name.substring(0, 2)}
+              </div>
+            `}
             <div class="flex flex-col gap-1">
               <span class="text-[10px] font-bold uppercase tracking-widest text-stone-400 font-heading">Dinos tu opinión</span>
               <h2 class="text-2xl font-black text-stone-950 font-heading tracking-tight leading-none">${business.name}</h2>

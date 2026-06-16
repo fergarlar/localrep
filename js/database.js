@@ -10,7 +10,7 @@ const DB_VERSION = "1.1.0";
 // Cuando crees tu base de datos gratuita en Firebase Console, copia y pega
 // tu objeto de configuración "firebaseConfig" aquí. 
 // Mientras este objeto esté vacío, la app usará automáticamente localStorage
-// para que el demo funcione sin necesidad de configurar nada.
+// para que la base de datos local funcione sin necesidad de configurar nada.
 const firebaseConfig = {
   apiKey: "AIzaSyB3rlKL2v1iVsnR8MOqF0-UOQlSWPkHUU4",
   authDomain: "stella-localrep.firebaseapp.com",
@@ -43,32 +43,14 @@ const DEFAULT_BUSINESSES = [
     id: "stellaensenada",
     name: "Stella Cucina al Forno",
     google_maps_url: "https://www.google.com/search?sca_esv=46988bc39be06c17&rlz=1C5CHFA_enMX963MX975&sxsrf=ANbL-n5ytEmCfcPQlg2b0nzgXsrPaxZgeA:1780159596490&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOWSMeyrTDZ6OSvuz2ahvt7h-VS3FROSRXUoN6kzcADZgk_bNaqo8YKyJkWu95LIkw15JjThg5pR57W57tsjs4jG2C3FtG3JGtM5FjjsXgdBrldOwfA%3D%3D&q=Stella,+Cucina+Al+Forno+Opiniones&sa=X&ved=2ahUKEwi6tJGju-GUAxWsLEQIHcS9PXcQ0bkNegQINRAH&biw=1440&bih=727&dpr=2",
-    logo_url: "", 
+    logo_url: "assets/logo.png", 
     username: "stella",
     password: "stella123",
-    webhook_url: ""
-  },
-  {
-    id: "cafe-del-sol",
-    name: "Café del Sol",
-    google_maps_url: "https://maps.app.goo.gl/hXfR9DqFf3F5jX3T7", 
-    logo_url: "", 
-    username: "admin",
-    password: "admin123",
-    webhook_url: ""
-  },
-  {
-    id: "la-parrilla-gourmet",
-    name: "La Parrilla Gourmet",
-    google_maps_url: "https://maps.app.goo.gl/9GqM7GvR4fJ3V9Y4A",
-    logo_url: "",
-    username: "parrilla",
-    password: "la123parrilla",
     webhook_url: ""
   }
 ];
 
-// Datos semilla de opiniones para poblar el Dashboard
+// Datos de opiniones para poblar inicialmente el Dashboard de Stella Cucina
 const getSeedReviews = () => {
   const reviews = [];
   const today = new Date();
@@ -81,7 +63,7 @@ const getSeedReviews = () => {
     { name: "Diego López", phone: "+34 688 222 333", comment: "Servicio muy lento para cobrar. Estuve esperando casi 10 minutos con la tarjeta en la mano y el camarero hablando con otra persona." }
   ];
 
-  ["stellaensenada", "cafe-del-sol"].forEach(bId => {
+  ["stellaensenada"].forEach(bId => {
     clients.forEach((client, i) => {
       const reviewDate = new Date();
       reviewDate.setDate(today.getDate() - (i + 1));
@@ -115,7 +97,7 @@ const getSeedPublicClicks = () => {
   const today = new Date();
   const distribution = [8, 12, 6, 14, 10, 15, 9]; 
   
-  ["stellaensenada", "cafe-del-sol"].forEach(bId => {
+  ["stellaensenada"].forEach(bId => {
     distribution.forEach((count, daysAgo) => {
       for (let i = 0; i < count; i++) {
         const clickDate = new Date();
@@ -138,7 +120,7 @@ const getSeedPublicClicks = () => {
 
 // Inicialización de base de datos con migración automática forzada
 export const initDatabase = () => {
-  if (localStorage.getItem("localrep_db_initialized") !== "stella") {
+  if (localStorage.getItem("localrep_db_initialized") !== "stella-prod") {
     localStorage.removeItem("localrep_businesses");
     localStorage.removeItem("localrep_reviews");
     localStorage.removeItem("localrep_public_clicks");
@@ -147,7 +129,7 @@ export const initDatabase = () => {
     localStorage.setItem("localrep_reviews", JSON.stringify(getSeedReviews()));
     localStorage.setItem("localrep_public_clicks", JSON.stringify(getSeedPublicClicks()));
     
-    localStorage.setItem("localrep_db_initialized", "stella");
+    localStorage.setItem("localrep_db_initialized", "stella-prod");
     localStorage.setItem("localrep_db_version", DB_VERSION);
     console.log("Base de datos local actualizada con Stella Cucina al Forno.");
   }

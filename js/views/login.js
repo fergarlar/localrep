@@ -88,15 +88,6 @@ export class LoginView {
             </button>
           </form>
 
-          <!-- Demostración Técnica Credenciales Pistas -->
-          <div class="mt-8 pt-6 border-t border-stone-200/60 text-center">
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">Credenciales de Demostración</span>
-            <div class="mt-2 flex flex-col justify-center gap-1 text-[11px] text-stone-500 font-sans">
-              <div>Usuario: <code class="bg-stone-100 px-1.5 py-0.5 rounded text-stone-800 font-mono font-bold">admin</code> | Clave: <code class="bg-stone-100 px-1.5 py-0.5 rounded text-stone-800 font-mono font-bold">admin123</code></div>
-              <div class="text-[10px] text-stone-400 mt-0.5">(Simula el Café del Sol con datos cargados)</div>
-            </div>
-          </div>
-
         </div>
       </div>
     `;

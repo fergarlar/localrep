@@ -27,9 +27,15 @@ export class DashboardView {
         <!-- CABECERA PRINCIPAL -->
         <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-200 pb-5">
           <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center font-heading font-extrabold text-lg shadow">
-              ${business.name.substring(0, 2).toUpperCase()}
-            </div>
+            ${business.logo_url ? `
+              <div class="h-12 w-12 flex items-center justify-center">
+                <img src="${business.logo_url.startsWith('http') || window.location.protocol === 'file:' ? business.logo_url : '/' + business.logo_url}" alt="${business.name}" class="h-full object-contain">
+              </div>
+            ` : `
+              <div class="w-12 h-12 rounded-full bg-stone-900 text-stone-100 flex items-center justify-center font-heading font-extrabold text-lg shadow">
+                ${business.name.substring(0, 2).toUpperCase()}
+              </div>
+            `}
             <div>
               <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400 font-heading">Panel de Control</span>
               <h1 class="text-2xl font-black text-stone-950 font-heading tracking-tight leading-none mt-0.5">${business.name}</h1>
@@ -153,7 +159,7 @@ export class DashboardView {
               <button type="button" id="test-webhook-btn" 
                 class="w-full py-2.5 border border-stone-250 hover:bg-stone-50 text-stone-800 rounded-xl text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer flex justify-center items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                <span>Enviar Clic de Prueba</span>
+                <span>Probar Envío Webhook</span>
               </button>
             </div>
           </div>
@@ -225,7 +231,7 @@ export class DashboardView {
       }
     });
 
-    // Enviar Webhook de Prueba
+    // Probar envío de Webhook
     testWebhookBtn.addEventListener("click", async () => {
       const payload = {
         event: "test_connection",
@@ -233,9 +239,9 @@ export class DashboardView {
         business_name: business.name,
         message: "¡Conexión establecida con LocalRep!",
         rating: 5,
-        customer_name: "Cliente de Prueba (n8n)",
+        customer_name: "Integración Stella Cucina",
         customer_phone: "+34 600 000 000",
-        comment: "Excelente integración técnica, listos para automatizar las opiniones críticas.",
+        comment: "Excelente integración de canal de opiniones críticas, lista para producción.",
         timestamp: new Date().toISOString()
       };
 
